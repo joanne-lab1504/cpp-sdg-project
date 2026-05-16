@@ -1,62 +1,138 @@
 #include <iostream>
-#include "ChatbotManager.h"
+#include <vector>
+#include <string>
 
 using namespace std;
 
+class Inquiry {
+private:
+    int id;
+    string name;
+    string message;
+
+public:
+    Inquiry(int i, string n, string m) {
+        id = i;
+        name = n;
+        message = m;
+    }
+
+    int getId() {
+        return id;
+    }
+
+    void display() {
+        cout << "\nID: " << id << endl;
+        cout << "Name: " << name << endl;
+        cout << "Inquiry: " << message << endl;
+    }
+};
+
+class ChatbotManager {
+private:
+    vector<Inquiry> inquiries;
+
+public:
+    void addInquiry(Inquiry inquiry) {
+        inquiries.push_back(inquiry);
+    }
+
+    void viewInquiries() {
+        if (inquiries.empty()) {
+            cout << "\nNo inquiries found.\n";
+            return;
+        }
+
+        for (size_t i = 0; i < inquiries.size(); i++) {
+            inquiries[i].display();
+            cout << "----------------------" << endl;
+        }
+    }
+
+    void searchInquiry(int id) {
+        bool found = false;
+
+        for (size_t i = 0; i < inquiries.size(); i++) {
+            if (inquiries[i].getId() == id) {
+                inquiries[i].display();
+                found = true;
+            }
+        }
+
+        if (!found) {
+            cout << "\nInquiry not found.\n";
+        }
+    }
+};
+
 int main() {
-
-    ChatbotManager chatbot;
-
-    chatbot.loadFromFile();
-
+    ChatbotManager manager;
     int choice;
 
     do {
-
-        cout << "\n===== She4Tech AI Chatbot System =====\n";
-        cout << "1. Start Chatbot\n";
-        cout << "2. View Customer Inquiries (Admin)\n";
-        cout << "3. Generate Summary Report (Admin)\n";
-        cout << "4. Save Data\n";
-        cout << "5. Exit\n";
-
+        cout << "\n===== She4Tech SDG Inquiry System =====" << endl;
+        cout << "1. Add Inquiry" << endl;
+        cout << "2. View Inquiries" << endl;
+        cout << "3. Search Inquiry" << endl;
+        cout << "0. Exit" << endl;
         cout << "Enter choice: ";
         cin >> choice;
-        cin.ignore();
+
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "\nInvalid input.\n";
+            continue;
+        }
 
         switch (choice) {
 
-            case 1:
-                chatbot.chatbotConversation();
-                break;
+        case 1: {
+            int id;
+            string name, message;
 
-            case 2:
-                if (chatbot.adminLogin()) {
-                    chatbot.viewInquiries();
-                }
-                break;
+            cout << "Enter ID: ";
+            cin >> id;
 
-            case 3:
-                if (chatbot.adminLogin()) {
-                    chatbot.generateReport();
-                }
-                break;
+            cin.ignore();
 
-            case 4:
-                chatbot.saveToFile();
-                cout << "Data saved successfully!\n";
-                break;
+            cout << "Enter Name: ";
+            getline(cin, name);
 
-            case 5:
-                chatbot.saveToFile();
-                cout << "Exiting program...\n";
-                break;
+            cout << "Enter Inquiry: ";
+            getline(cin, message);
 
-            default:
-                cout << "Invalid choice.\n";
+            Inquiry inquiry(id, name, message);
+
+            manager.addInquiry(inquiry);
+
+            cout << "\nInquiry added successfully.\n";
+            break;
         }
 
-    } while (choice != 5);
+        case 2:
+            manager.viewInquiries();
+            break;
+
+        case 3: {
+            int id;
+
+            cout << "Enter Inquiry ID: ";
+            cin >> id;
+
+            manager.searchInquiry(id);
+            break;
+        }
+
+        case 0:
+            cout << "\nProgram Ended.\n";
+            break;
+
+        default:
+            cout << "\nInvalid choice.\n";
+        }
+
+    } while (choice != 0);
 
     return 0;
 }
